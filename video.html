@@ -518,6 +518,17 @@
       border-left: 16px solid var(--white);
     }
 
+    .video-card.no-video .play-mark::after {
+      display: none;
+    }
+
+    .video-card.no-video .play-mark::before {
+      content: "—";
+      color: var(--muted);
+      font-size: 24px;
+      font-weight: 900;
+    }
+
     .video-content {
       position: absolute;
       left: 22px;
@@ -550,15 +561,9 @@
       color: var(--white);
     }
 
-    .video-bottom {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 18px;
-    }
-
     .video-content h3 {
       margin-bottom: 8px;
+      max-width: 620px;
       font-size: clamp(28px, 4vw, 48px);
       line-height: 0.9;
       letter-spacing: -0.07em;
@@ -566,30 +571,10 @@
     }
 
     .video-content p {
-      max-width: 440px;
+      max-width: 520px;
       color: var(--muted);
       font-size: 14px;
       line-height: 1.45;
-    }
-
-    .arrow {
-      flex: 0 0 auto;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: var(--white);
-      color: #050505;
-      font-size: 24px;
-      font-weight: 900;
-      transition: 0.25s ease;
-    }
-
-    .video-card:hover .arrow {
-      background: var(--red);
-      color: var(--white);
-      transform: translate(4px, -4px);
     }
 
     .empty-state {
@@ -606,6 +591,97 @@
 
     .empty-state.active {
       display: block;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(16px);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-inner {
+      width: min(1100px, 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #050505;
+      overflow: hidden;
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+    }
+
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-copy {
+      height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .modal-copy:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .modal-close {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--white);
+      font-size: 24px;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--red);
+      border-color: var(--red);
+    }
+
+    .modal-video {
+      display: block;
+      width: 100%;
+      max-height: 76vh;
+      background: #000;
     }
 
     .contact-section {
@@ -853,14 +929,6 @@
         min-height: 390px;
       }
 
-      .video-bottom {
-        display: block;
-      }
-
-      .arrow {
-        margin-top: 18px;
-      }
-
       .contact-block {
         padding: 34px 24px;
       }
@@ -877,6 +945,25 @@
       .toast {
         width: calc(100% - 24px);
         text-align: center;
+      }
+
+      .modal {
+        padding: 12px;
+      }
+
+      .modal-top {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 14px;
+      }
+
+      .modal-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .modal-copy {
+        flex: 1;
       }
     }
   </style>
@@ -929,7 +1016,7 @@
           </h1>
 
           <p class="hero-description">
-            Выберите нужные фильтры, чтобы быстро найти похожие задачи, форматы и примеры работ
+            Выберите нужное направление, чтобы быстро найти похожие задачи, форматы и примеры работ
           </p>
         </div>
 
@@ -945,13 +1032,14 @@
           </div>
 
           <p class="section-text">
-            Каждая работа размечена тегами, поэтому каталог можно быстро фильтровать по типу съёмки, задаче и площадке
+            Каждая работа размечена тегами, поэтому каталог можно быстро фильтровать по направлению съёмки
           </p>
         </div>
 
         <div class="filters-panel reveal">
           <div class="filters-top">
             <div class="filters-title">Фильтры</div>
+
             <div class="results-count">
               Найдено: <span id="resultsCount">0</span>
             </div>
@@ -959,191 +1047,16 @@
 
           <div class="filters">
             <button class="filter-button active" type="button" data-filter="all">Все</button>
-            <button class="filter-button" type="button" data-filter="реклама">Реклама</button>
-            <button class="filter-button" type="button" data-filter="мероприятия">Мероприятия</button>
+            <button class="filter-button" type="button" data-filter="репортажка">Репортажка</button>
+            <button class="filter-button" type="button" data-filter="рилсы">Рилсы</button>
+            <button class="filter-button" type="button" data-filter="недвижимость">Недвижимость</button>
+            <button class="filter-button" type="button" data-filter="рекламные">Рекламные</button>
             <button class="filter-button" type="button" data-filter="интервью">Интервью</button>
-            <button class="filter-button" type="button" data-filter="соцсети">Соцсети</button>
-            <button class="filter-button" type="button" data-filter="бренд">Бренд</button>
-            <button class="filter-button" type="button" data-filter="репортаж">Репортаж</button>
-            <button class="filter-button" type="button" data-filter="монтаж">Монтаж</button>
-            <button class="filter-button" type="button" data-filter="цвет">Цвет</button>
+            <button class="filter-button" type="button" data-filter="музыка и танцы">Музыка и танцы</button>
           </div>
         </div>
 
-        <div class="works-grid" id="worksGrid">
-          <article class="video-card large reveal" data-tags="реклама бренд соцсети монтаж цвет">
-            <div class="video-pattern pattern-1"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Реклама</span>
-                <span class="tag">Бренд</span>
-                <span class="tag">Соцсети</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>Запуск бренда</h3>
-                  <p>Динамичный промо-ролик для презентации нового продукта и рекламной кампании</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card small reveal" data-tags="мероприятия репортаж монтаж">
-            <div class="video-pattern pattern-2"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Мероприятия</span>
-                <span class="tag">Репортаж</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>Форум города</h3>
-                  <p>Видеоотчёт с события: гости, атмосфера, ключевые моменты и эмоции</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card small reveal" data-tags="интервью бренд цвет">
-            <div class="video-pattern pattern-3"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Интервью</span>
-                <span class="tag">Бренд</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>История проекта</h3>
-                  <p>Спокойное экспертное интервью для сайта, презентации и социальных сетей</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card large reveal" data-tags="соцсети реклама монтаж">
-            <div class="video-pattern pattern-4"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Соцсети</span>
-                <span class="tag">Реклама</span>
-                <span class="tag">Монтаж</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>Reels серия</h3>
-                  <p>Набор коротких вертикальных роликов для прогрева аудитории и продвижения услуг</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card large reveal" data-tags="бренд реклама цвет">
-            <div class="video-pattern pattern-5"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Бренд</span>
-                <span class="tag">Реклама</span>
-                <span class="tag">Цвет</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>Имиджевый ролик</h3>
-                  <p>Кинематографичный бренд-фильм с акцентом на смысл, атмосферу и визуальный стиль</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card small reveal" data-tags="репортаж мероприятия соцсети">
-            <div class="video-pattern pattern-6"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Репортаж</span>
-                <span class="tag">Мероприятия</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>День компании</h3>
-                  <p>Живой репортаж с мероприятия для внутренней коммуникации и публикаций</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card small reveal" data-tags="интервью соцсети монтаж">
-            <div class="video-pattern pattern-1"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Интервью</span>
-                <span class="tag">Соцсети</span>
-                <span class="tag">Монтаж</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>Экспертные видео</h3>
-                  <p>Серия коротких ответов на вопросы клиента в формате вертикального контента</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-
-          <article class="video-card large reveal" data-tags="мероприятия реклама бренд цвет">
-            <div class="video-pattern pattern-2"></div>
-            <div class="play-mark"></div>
-
-            <div class="video-content">
-              <div class="video-meta">
-                <span class="tag red">Мероприятия</span>
-                <span class="tag">Бренд</span>
-                <span class="tag">Цвет</span>
-              </div>
-
-              <div class="video-bottom">
-                <div>
-                  <h3>Открытие сезона</h3>
-                  <p>Эмоциональный ролик о событии с акцентом на масштаб, людей и настроение</p>
-                </div>
-
-                <span class="arrow">↗</span>
-              </div>
-            </div>
-          </article>
-        </div>
+        <div class="works-grid" id="worksGrid"></div>
 
         <div class="empty-state" id="emptyState">
           По выбранному фильтру пока нет работ
@@ -1188,9 +1101,306 @@
     </div>
   </footer>
 
+  <div class="modal" id="videoModal">
+    <div class="modal-inner">
+      <div class="modal-top">
+        <div class="modal-title" id="modalTitle">Видео</div>
+
+        <div class="modal-actions">
+          <button class="modal-copy" type="button">
+            Скопировать ссылку
+          </button>
+
+          <button class="modal-close" type="button" aria-label="Закрыть видео">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <video
+        class="modal-video"
+        id="modalVideo"
+        controls
+        playsinline
+        preload="none"
+        controlslist="nodownload noplaybackrate noremoteplayback"
+        disablepictureinpicture
+        oncontextmenu="return false"
+      ></video>
+    </div>
+  </div>
+
   <div class="toast" id="toast">Почта скопирована</div>
 
   <script>
+    const works = [
+      {
+        title: "Битва дронов",
+        subtitle: "Закрытие регионального фестиваля",
+        direction: "репортажка"
+      },
+      {
+        title: "Виллис Хакатон",
+        subtitle: "Финал всероссийского этапа соревнований",
+        direction: "репортажка"
+      },
+      {
+        title: "Выпускной СевГУ",
+        subtitle: "Вручение красных дипломов выпускников",
+        direction: "репортажка"
+      },
+      {
+        title: "МедиаПритяжение",
+        subtitle: "Всероссийская смена Движения Первых в ВДЦ Смена",
+        direction: "репортажка"
+      },
+      {
+        title: "КВН",
+        subtitle: "Открытие сезона севастопольской лиги",
+        direction: "репортажка"
+      },
+      {
+        title: "Лидеры Побед",
+        subtitle: "Всероссийская смена ЮнАрмии в ВДЦ Океан",
+        direction: "репортажка"
+      },
+      {
+        title: "Представление в музее",
+        subtitle: "Спектакль по поэме Бродского в Подземном Севастополе",
+        direction: "репортажка"
+      },
+      {
+        title: "Таврида Меганом",
+        subtitle: "Образовательная программа Доказательная урбанистика",
+        direction: "репортажка"
+      },
+      {
+        title: "Дорога к родным местам",
+        subtitle: "Туристический проект от Росмолодежь.Гранты",
+        direction: "репортажка"
+      },
+      {
+        title: "Форум Родная гавань",
+        subtitle: "Всероссийский этап форума в Севастополе",
+        direction: "репортажка"
+      },
+      {
+        title: "Новый Херсонес",
+        subtitle: "Таврический вояж, 3-камерная съемка",
+        direction: "репортажка"
+      },
+      {
+        title: "Диджей сеты",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "История одного волейболиста",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "Концерт в Артеке",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "Наэкономил",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "Чемпионат Крыма по волейболу",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "IronMen1",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "IronMen2",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "IronMen3",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "IronMen4",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "IronMen5",
+        subtitle: "",
+        direction: "рилсы",
+        video: "https://github.com/VladimirKornienko2000/video/raw/refs/heads/main/IronMen5.mp4"
+      },
+      {
+        title: "IronMen6",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "IronMen7",
+        subtitle: "",
+        direction: "рилсы"
+      },
+      {
+        title: "Обзор дома под ключ",
+        subtitle: "Обзор построенного дома под ключ с ведущим",
+        direction: "недвижимость"
+      },
+      {
+        title: "Обзор коробки дома без ведущего",
+        subtitle: "",
+        direction: "недвижимость"
+      },
+      {
+        title: "Обзор коробки дома с ведущим",
+        subtitle: "",
+        direction: "недвижимость"
+      },
+      {
+        title: "Процесс строительства дома",
+        subtitle: "Блог со стройки",
+        direction: "недвижимость"
+      },
+      {
+        title: "Строительный блог Альянс",
+        subtitle: "Студийная съемка YouTube-блога",
+        direction: "недвижимость"
+      },
+      {
+        title: "Строительный блог ГуруХаус",
+        subtitle: "Студийная съемка YouTube-блога",
+        direction: "недвижимость"
+      },
+      {
+        title: "Бренд одежды Саботаж",
+        subtitle: "Реклама бренда одежды",
+        direction: "рекламные"
+      },
+      {
+        title: "Миллениум",
+        subtitle: "Имиджевый ролик ИТ компании",
+        direction: "рекламные"
+      },
+      {
+        title: "Покер",
+        subtitle: "Реклама Event-компании",
+        direction: "рекламные"
+      },
+      {
+        title: "Ресторан Марани",
+        subtitle: "Реклама ресторана для городских экранов",
+        direction: "рекламные",
+        video: "https://github.com/VladimirKornienko2000/video/raw/refs/heads/main/%D0%A0%D0%B5%D1%81%D1%82%D0%BE%D1%80%D0%B0%D0%BD%20%D0%9C%D0%B0%D1%80%D0%B0%D0%BD%D0%B8.mp4"
+      },
+      {
+        title: "Супермаркет Меркурий",
+        subtitle: "Новогодний имиджевый ролик для соцсетей",
+        direction: "рекламные"
+      },
+      {
+        title: "Тайский массаж",
+        subtitle: "Реклама массажного салона для ТВ",
+        direction: "рекламные"
+      },
+      {
+        title: "ЮнАрмия",
+        subtitle: "Имиджевый ролик о ЮнАрмии",
+        direction: "рекламные"
+      },
+      {
+        title: "Audi Q3",
+        subtitle: "Реклама авто",
+        direction: "рекламные"
+      },
+      {
+        title: "Винодельня Акчурина",
+        subtitle: "Интервью с руководителем винодельни",
+        direction: "интервью"
+      },
+      {
+        title: "Интервью о скульпторе Чиже",
+        subtitle: "Интервью с дочерьми скульптора о его жизни",
+        direction: "интервью"
+      },
+      {
+        title: "Музыкальный клип Ритм Первых",
+        subtitle: "7-камерная съемка клипа в Артеке для Движения Первых",
+        direction: "музыка и танцы"
+      },
+      {
+        title: "Песня Поклонимся",
+        subtitle: "6-камерная запись песни к 9 мая для Правительства Севастополя",
+        direction: "музыка и танцы"
+      },
+      {
+        title: "Сниппет Нравится",
+        subtitle: "Музыкальный клип на Тавриде к выпуску песни",
+        direction: "музыка и танцы"
+      },
+      {
+        title: "Танец ансамбля Радость",
+        subtitle: "5-камерная съемка танца для заслуженного ансамбля Радость",
+        direction: "музыка и танцы"
+      },
+      {
+        title: "Танцевальный клип Голубка",
+        subtitle: "Хореографическая постановка на песню",
+        direction: "музыка и танцы"
+      },
+      {
+        title: "Флешмоб в Артеке, 600 детей",
+        subtitle: "11-камерная съемка большого флешмоба для Движения Первых",
+        direction: "музыка и танцы"
+      }
+    ];
+
+    const worksGrid = document.querySelector("#worksGrid");
+    const resultsCount = document.querySelector("#resultsCount");
+    const emptyState = document.querySelector("#emptyState");
+
+    function renderCards() {
+      worksGrid.innerHTML = "";
+
+      works.forEach((work, index) => {
+        const card = document.createElement("article");
+        const patternClass = `pattern-${index % 6 + 1}`;
+        const noVideoClass = work.video ? "" : "no-video";
+
+        card.className = `video-card small ${noVideoClass} reveal`;
+        card.dataset.direction = work.direction;
+        card.dataset.video = work.video || "";
+        card.dataset.title = work.title;
+
+        card.innerHTML = `
+          <div class="video-pattern ${patternClass}"></div>
+          <div class="play-mark"></div>
+
+          <div class="video-content">
+            <div class="video-meta">
+              <span class="tag red">${work.direction}</span>
+              ${work.video ? `<span class="tag">Видео</span>` : `<span class="tag">Скоро</span>`}
+            </div>
+
+            <h3>${work.title}</h3>
+            <p>${work.subtitle || "Видео в выбранном направлении"}</p>
+          </div>
+        `;
+
+        worksGrid.appendChild(card);
+      });
+    }
+
+    renderCards();
+
     const revealElements = document.querySelectorAll(".reveal");
 
     const observer = new IntersectionObserver(
@@ -1244,21 +1454,35 @@
     });
 
     const filterButtons = document.querySelectorAll(".filter-button");
-    const videoCards = document.querySelectorAll(".video-card");
-    const resultsCount = document.querySelector("#resultsCount");
-    const emptyState = document.querySelector("#emptyState");
 
-    function updateResultsCount(count) {
-      resultsCount.textContent = count;
+    function updateVisibleCardsLayout() {
+      const visibleCards = Array.from(document.querySelectorAll(".video-card:not(.hidden)"));
+
+      const layoutPattern = [
+        "large",
+        "small",
+        "small",
+        "large",
+        "large",
+        "small",
+        "small",
+        "large"
+      ];
+
+      visibleCards.forEach((card, index) => {
+        card.classList.remove("large", "small");
+        card.classList.add(layoutPattern[index % layoutPattern.length]);
+      });
     }
 
     function filterCards(filter) {
+      const videoCards = document.querySelectorAll(".video-card");
       let visibleCount = 0;
 
       videoCards.forEach(card => {
-        const tags = card.dataset.tags;
+        const direction = card.dataset.direction;
 
-        if (filter === "all" || tags.includes(filter)) {
+        if (filter === "all" || direction === filter) {
           card.classList.remove("hidden");
           visibleCount += 1;
         } else {
@@ -1266,7 +1490,9 @@
         }
       });
 
-      updateResultsCount(visibleCount);
+      updateVisibleCardsLayout();
+
+      resultsCount.textContent = visibleCount;
 
       if (visibleCount === 0) {
         emptyState.classList.add("active");
@@ -1282,19 +1508,24 @@
         });
 
         button.classList.add("active");
-
-        const filter = button.dataset.filter;
-        filterCards(filter);
+        filterCards(button.dataset.filter);
       });
     });
 
     filterCards("all");
 
-    const copyEmailButton = document.querySelector(".copy-email");
+    const modal = document.querySelector("#videoModal");
+    const modalVideo = document.querySelector("#modalVideo");
+    const modalTitle = document.querySelector("#modalTitle");
+    const modalClose = document.querySelector(".modal-close");
+    const modalCopy = document.querySelector(".modal-copy");
     const toast = document.querySelector("#toast");
-    let toastTimer;
 
-    function showToast() {
+    let toastTimer;
+    let currentVideoLink = "";
+
+    function showToast(text) {
+      toast.textContent = text;
       toast.classList.add("active");
 
       clearTimeout(toastTimer);
@@ -1304,12 +1535,91 @@
       }, 1800);
     }
 
+    function openVideo(title, src) {
+      currentVideoLink = src;
+
+      modalTitle.textContent = title;
+      modal.classList.add("active");
+      document.body.style.overflow = "hidden";
+
+      modalVideo.muted = false;
+      modalVideo.defaultMuted = false;
+      modalVideo.volume = 1;
+      modalVideo.src = src;
+      modalVideo.load();
+
+      modalVideo.play().catch(() => {});
+    }
+
+    function closeVideo() {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+
+      currentVideoLink = "";
+
+      modalVideo.pause();
+      modalVideo.removeAttribute("src");
+      modalVideo.load();
+    }
+
+    worksGrid.addEventListener("click", event => {
+      const card = event.target.closest(".video-card");
+
+      if (!card) return;
+
+      const video = card.dataset.video;
+      const title = card.dataset.title;
+
+      if (!video) {
+        showToast("Видео скоро будет добавлено");
+        return;
+      }
+
+      openVideo(title, video);
+    });
+
+    modalClose.addEventListener("click", closeVideo);
+
+    modalCopy.addEventListener("click", async () => {
+      if (!currentVideoLink) {
+        showToast("Ссылка недоступна");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(currentVideoLink);
+        showToast("Ссылка на видео скопирована");
+      } catch {
+        const temporaryInput = document.createElement("input");
+        temporaryInput.value = currentVideoLink;
+        document.body.appendChild(temporaryInput);
+        temporaryInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(temporaryInput);
+        showToast("Ссылка на видео скопирована");
+      }
+    });
+
+    modal.addEventListener("click", event => {
+      if (event.target === modal) {
+        closeVideo();
+      }
+    });
+
+    window.addEventListener("keydown", event => {
+      if (event.key === "Escape" && modal.classList.contains("active")) {
+        closeVideo();
+      }
+    });
+
+    const copyEmailButton = document.querySelector(".copy-email");
+
     copyEmailButton.addEventListener("click", async () => {
       const email = copyEmailButton.dataset.email;
 
       try {
         await navigator.clipboard.writeText(email);
-        showToast();
+        showToast("Почта скопирована");
       } catch {
         const temporaryInput = document.createElement("input");
         temporaryInput.value = email;
@@ -1317,7 +1627,7 @@
         temporaryInput.select();
         document.execCommand("copy");
         document.body.removeChild(temporaryInput);
-        showToast();
+        showToast("Почта скопирована");
       }
     });
   </script>
