@@ -1,3 +1,5 @@
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -203,6 +205,10 @@
       align-items: center;
     }
 
+    .hero-content {
+      grid-column: 1 / -1;
+    }
+
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -232,6 +238,10 @@
       line-height: 0.86;
       letter-spacing: -0.08em;
       text-transform: uppercase;
+    }
+
+    h1 span {
+      display: block;
     }
 
     .accent-text {
@@ -338,7 +348,7 @@
 
     .choice-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 18px;
     }
 
@@ -366,6 +376,7 @@
 
     .pattern-photo,
     .pattern-video,
+    .pattern-360,
     .pattern-equipment {
       position: absolute;
       inset: 0;
@@ -375,6 +386,7 @@
 
     .choice-card:hover .pattern-photo,
     .choice-card:hover .pattern-video,
+    .choice-card:hover .pattern-360,
     .equipment-card:hover .pattern-equipment {
       transform: scale(1.08);
       filter: saturate(1.18);
@@ -408,6 +420,25 @@
         34px 100%,
         100% 34px,
         100% 100%,
+        100% 100%,
+        100% 100%;
+    }
+
+    .pattern-360 {
+      background:
+        radial-gradient(circle at 50% 50%, rgba(229, 9, 20, 0.82) 0 10px, transparent 11px),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.16) 0 52px, transparent 53px),
+        radial-gradient(circle at 50% 50%, transparent 0 86px, rgba(255, 255, 255, 0.12) 87px 89px, transparent 90px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(229, 9, 20, 0.22), transparent 45%),
+        #080808;
+      background-size:
+        100% 100%,
+        100% 100%,
+        100% 100%,
+        40px 40px,
+        40px 40px,
         100% 100%,
         100% 100%;
     }
@@ -487,26 +518,9 @@
       padding: 0 0 110px;
     }
 
-    .equipment-wrap {
-      padding: 26px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background:
-        linear-gradient(135deg, rgba(229, 9, 20, 0.08), transparent 38%),
-        rgba(255, 255, 255, 0.025);
-    }
-
-    .equipment-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 30px;
-      margin-bottom: 22px;
-    }
-
     .equipment-card {
       display: block;
-      min-height: 360px;
+      min-height: 470px;
     }
 
     .clients-section {
@@ -760,6 +774,10 @@
         min-height: 410px;
       }
 
+      .choice-card:last-child {
+        grid-column: 1 / -1;
+      }
+
       .clients-grid {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -794,13 +812,13 @@
         min-height: 360px;
       }
 
+      .equipment-card {
+        min-height: 360px;
+      }
+
       .equipment-wrap {
         padding: 14px;
         border-radius: 14px;
-      }
-
-      .equipment-card {
-        min-height: 340px;
       }
 
       .choice-content,
@@ -884,16 +902,17 @@
           </div>
 
           <h1>
-            Мы визуализируем ваши
-            <span class="accent-text">уникальные смыслы</span>
+            <span>Мы</span>
+            <span class="accent-text">ТРАНСЛИРУЕМ</span>
+            <span>ваши</span>
+            <span>уникальные</span>
+            <span>смыслы</span>
           </h1>
 
           <p class="hero-description">
             Создаём фото и видеоконтент для вашего развития
           </p>
         </div>
-
-        <div class="hero-pattern reveal" aria-hidden="true"></div>
       </div>
     </section>
 
@@ -903,10 +922,6 @@
           <div>
             <h2>Выберите направление</h2>
           </div>
-
-          <p class="section-text">
-            Два быстрых входа в портфолио, чтобы сразу перейти к нужному формату
-          </p>
         </div>
 
         <div class="choice-grid">
@@ -918,8 +933,6 @@
                 <h3>Фото</h3>
                 <p>Портреты, репортажи, бренды, мероприятия и визуальный контент</p>
               </div>
-
-              <span class="arrow">↗</span>
             </div>
           </a>
 
@@ -931,8 +944,17 @@
                 <h3>Видео</h3>
                 <p>Ролики, интервью, мероприятия, рекламные видео и контент для соцсетей</p>
               </div>
+            </div>
+          </a>
 
-              <span class="arrow">↗</span>
+          <a href="tour360.html" class="choice-card reveal">
+            <div class="pattern-360"></div>
+
+            <div class="choice-content">
+              <div>
+                <h3>360-туры</h3>
+                <p>Круговые обзорные туры для объектов недвижимости</p>
+              </div>
             </div>
           </a>
         </div>
@@ -941,30 +963,16 @@
 
     <section class="equipment-section">
       <div class="container">
-        <div class="equipment-wrap reveal">
-          <div class="equipment-head">
+        <a href="equipment.html" class="equipment-card reveal">
+          <div class="pattern-equipment"></div>
+
+          <div class="equipment-content">
             <div>
-              <h2>Аренда оборудования</h2>
+              <h3>Аренда оборудования</h3>
+              <p>Камеры, свет, звук, стабилизация и другое оборудование для съёмок</p>
             </div>
-
-            <p class="section-text">
-              Перечень оборудования для создания фото и видео контента
-            </p>
           </div>
-
-          <a href="equipment.html" class="equipment-card">
-            <div class="pattern-equipment"></div>
-
-            <div class="equipment-content">
-              <div>
-                <h3>Каталог техники</h3>
-                <p>Камеры, свет, звук, стабилизация и другое оборудование для съёмок</p>
-              </div>
-
-              <span class="arrow">↗</span>
-            </div>
-          </a>
-        </div>
+        </a>
       </div>
     </section>
 
@@ -975,10 +983,6 @@
             <div class="section-kicker">Заказчики</div>
             <h2>Нам доверяют</h2>
           </div>
-
-          <p class="section-text">
-            Здесь будут логотипы ваших клиентов и партнёров
-          </p>
         </div>
 
         <div class="clients-grid">
