@@ -180,24 +180,9 @@
       overflow: hidden;
     }
 
-    .hero::after {
-      content: "VIDEO";
-      position: absolute;
-      right: -4vw;
-      bottom: 0;
-      z-index: -1;
-      color: transparent;
-      -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
-      font-size: clamp(130px, 24vw, 360px);
-      font-weight: 900;
-      letter-spacing: -0.08em;
-      line-height: 1;
-      text-transform: uppercase;
-    }
-
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
+      grid-template-columns: 1fr;
       gap: 42px;
       align-items: center;
     }
@@ -246,83 +231,8 @@
       line-height: 1.45;
     }
 
-    .hero-pattern {
-      position: relative;
-      min-height: 480px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.13) 0 6px, transparent 6px 28px),
-        linear-gradient(0deg, rgba(229, 9, 20, 0.42) 0 2px, transparent 2px 34px),
-        radial-gradient(circle at 70% 28%, rgba(229, 9, 20, 0.72), transparent 18%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 42%),
-        #080808;
-      background-size:
-        34px 100%,
-        100% 34px,
-        100% 100%,
-        100% 100%,
-        100% 100%;
-      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
-      transition: transform 0.2s ease;
-    }
-
-    .hero-pattern::after {
-      content: "";
-      position: absolute;
-      width: 112px;
-      height: 112px;
-      border-radius: 50%;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      box-shadow:
-        0 0 0 34px rgba(229, 9, 20, 0.08),
-        0 0 80px rgba(229, 9, 20, 0.35);
-    }
-
-    .hero-pattern::before {
-      content: "";
-      position: absolute;
-      z-index: 2;
-      top: 50%;
-      left: 50%;
-      transform: translate(-38%, -50%);
-      width: 0;
-      height: 0;
-      border-top: 18px solid transparent;
-      border-bottom: 18px solid transparent;
-      border-left: 28px solid var(--white);
-    }
-
     .catalog {
       padding: 0 0 110px;
-    }
-
-    .catalog-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 30px;
-      margin-bottom: 26px;
-    }
-
-    .catalog-head h2 {
-      max-width: 760px;
-      font-size: clamp(38px, 6vw, 82px);
-      line-height: 0.9;
-      letter-spacing: -0.07em;
-      text-transform: uppercase;
-    }
-
-    .section-text {
-      max-width: 440px;
-      color: var(--muted);
-      font-size: 16px;
-      line-height: 1.55;
     }
 
     .filters-panel {
@@ -868,16 +778,8 @@
         grid-template-columns: 1fr;
       }
 
-      .hero-pattern {
-        min-height: 360px;
-      }
-
-      .catalog-head {
-        display: block;
-      }
-
-      .section-text {
-        margin-top: 18px;
+      .catalog {
+        padding-top: 0;
       }
 
       .video-card.large,
@@ -906,10 +808,6 @@
       .hero {
         min-height: auto;
         padding-bottom: 76px;
-      }
-
-      .hero-pattern {
-        min-height: 300px;
       }
 
       .catalog,
@@ -1019,23 +917,11 @@
             Выберите нужное направление, чтобы быстро найти похожие задачи, форматы и примеры работ
           </p>
         </div>
-
-        <div class="hero-pattern reveal" aria-hidden="true"></div>
       </div>
     </section>
 
     <section class="catalog">
       <div class="container">
-        <div class="catalog-head reveal">
-          <div>
-            <h2>Подберите нужный формат</h2>
-          </div>
-
-          <p class="section-text">
-            Каждая работа размечена тегами, поэтому каталог можно быстро фильтровать по направлению съемки
-          </p>
-        </div>
-
         <div class="filters-panel reveal">
           <div class="filters-top">
             <div class="filters-title">Фильтры</div>
@@ -1461,23 +1347,6 @@
 
     revealElements.forEach(element => {
       observer.observe(element);
-    });
-
-    const heroPattern = document.querySelector(".hero-pattern");
-
-    window.addEventListener("mousemove", event => {
-      if (!heroPattern) return;
-
-      const x = (event.clientX / window.innerWidth - 0.5) * 8;
-      const y = (event.clientY / window.innerHeight - 0.5) * 8;
-
-      heroPattern.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
-    });
-
-    window.addEventListener("mouseleave", () => {
-      if (!heroPattern) return;
-
-      heroPattern.style.transform = "rotateY(0deg) rotateX(0deg)";
     });
 
     const menuButton = document.querySelector(".menu-button");
